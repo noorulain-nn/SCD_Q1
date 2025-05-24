@@ -9,6 +9,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Health check endpoints
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'healthy' });
+});
+
+app.get('/ready', (req, res) => {
+  res.status(200).json({ status: 'ready' });
+});
+
 // Proxy configurations
 const authProxy = createProxyMiddleware({
   target: process.env.AUTH_SERVICE_URL,
