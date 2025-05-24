@@ -1,0 +1,39 @@
+name: Comment Service CI
+
+on:
+  push:
+    paths:
+      - 'services/comment-service/**'
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+
+    services:
+      mongodb:
+        image: mongo
+        ports:
+          - 27017:27017
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        working-directory: ./services/comment-service
+        run: npm ci
+
+      - name: Run tests
+        working-directory: ./services/comment-service
+        run: npm test
+        env:
+          MONGO_URI: mongodb://localhost:27017/test
+          JWT_SECRET: test-secret
+
+      - name: Build Docker image
+        working-directory: ./services/comment-service
+        run: docker build -t comment-service .
